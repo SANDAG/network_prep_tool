@@ -7,7 +7,9 @@ def modify_parking_cost(scenario_path,rate,policy,mgra_MoHub):
     df_policy = pd.read_csv(policy)
     df_mohub = pd.read_csv(mgra_MoHub)
     df_mgra = pd.read_csv(os.path.join(scenario_path,"input", "mgra15_based_input2035.csv"))
-    merged_df = pd.merge(df_mohub,df_policy,on='MoHubType',how='left')[['MGRA','Hourly','Daily','Monthly']]
+    merged_df = pd.merge(df_mohub,df_policy,on='MoHubType',how='left')
+    merged_df.loc[merged_df['PARKCOV_ID'].isnull(),['Hourly','Daily','Monthly']] = 0
+    merged_df = merged_df[['mgra','Hourly','Daily','Monthly']]
     merged_df.columns = ['mgra','exp_hourly','exp_daily','exp_monthly']
 
     merged_df['exp_hourly'] = merged_df['exp_hourly']*rate
@@ -26,6 +28,9 @@ def modify_parking_cost(scenario_path,rate,policy,mgra_MoHub):
 policy = "T:/projects/sr15/abm3_dev/sensitivity_test_plan/test_inputs/07_parking_cost_pos50/ParkingPolicies.csv"
 mgra_MoHub = "T:/projects/sr15/abm3_dev/sensitivity_test_plan/test_inputs/07_parking_cost_pos50/moHub_mgra.csv"
 scenario_path = sys.argv[1]
+# scenario_path = 'T:/projects/sr15/abm3_dev/sensitivity_test_plan/2035_0126_template/'
+# policy = './ParkingPolicies_PCA.csv'
+# mgra_MoHub = './moHub_mgra_PCA.csv'
 rate_perc = sys.argv[2] # 0,50,-50 = *1, *1.5, *0.5
 output_path = sys.argv[3]
 if rate_perc=='0':
